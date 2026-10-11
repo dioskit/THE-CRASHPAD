@@ -1,0 +1,17 @@
+# Original full-size photos — the site uses the web copies in assets/img/
+assets/images/
+
+# Internal notes and design source files (not part of the website)
+comments_and_changes.md
+clean_vision_board_contents.txt
+top_sections_dump.txt
+vision_board_analysis.md
+vision_board_text_dump.txt
+thecrashpad_vision_borad.svg
+image_gallery.html
+extracted_assets/
+public/
+
+# System / editor files
+.DS_Store
+.claude/
