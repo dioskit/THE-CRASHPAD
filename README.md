@@ -14,7 +14,22 @@ Then open http://localhost:8000.
 
 ## Adding photos
 
-Put web-sized images (max ~1800px wide, JPG) in the matching `assets/img/<Section>_images/` folder and reference them from `index.html`.
+1. Put the original photos in the matching folder in `assets/images/` (e.g. `assets/images/AQI_images/`).
+   Originals stay on your computer only; they are not uploaded to GitHub.
+2. Make the web-sized copies (macOS):
+
+   ```bash
+   ./scripts/build-images.sh
+   ```
+
+   This writes JPGs (max 1800px) to `assets/img/<same folder>/`, with lowercase names
+   (`IMG_1346.TIFF` becomes `img-1346.jpg`). Team portraits also get small copies in `sm/` and `face/`.
+   Use `--clean` to rebuild everything.
+3. Reference the new file from `index.html`, then commit and push. Render redeploys automatically.
+
+## Fonts
+
+Glacial Indifference is self-hosted in `assets/fonts/` (SIL Open Font License).
 
 ## Contact form
 
