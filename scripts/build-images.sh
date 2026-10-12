@@ -4,7 +4,8 @@
 #   assets/images/<Folder>/<Original File>.JPG  ->  assets/img/<Folder>/<original-file>.jpg
 #
 # - Photos: JPEG, max 1800px on the long side.
-# - Logo_images: PNG (keeps transparency), max 500px.
+# - Logo_images, Client_Logos, Partners_logos: PNG (keeps transparency), max 500px; SVGs copied as-is.
+# - Videos (.mov/.mp4): a still frame as PNG.
 # - TeamProfile_images: also a 640px copy in sm/ for the team grid and a 140px copy in face/ for the hero.
 # Only new or changed originals are converted. Pass --clean to rebuild everything from scratch
 # (this also removes web copies whose original was deleted).
@@ -33,7 +34,26 @@ while IFS= read -r -d '' file; do
   name=$(slug "$(basename "$file")")
   mkdir -p "$OUT/$folder"
 
-  if [[ "$folder" == "Logo_images" ]]; then
+  ext=$(echo "${file##*.}" | tr 'A-Z' 'a-z')
+
+  if [[ "$ext" == "svg" ]]; then
+    # Vector logos are already web-ready
+    dest="$OUT/$folder/$name.svg"
+    [[ -f "$dest" && "$dest" -nt "$file" ]] && continue
+    cp "$file" "$dest"
+  elif [[ "$ext" == "mov" || "$ext" == "mp4" ]]; then
+    # Video: keep a still frame (Quick Look thumbnail)
+    dest="$OUT/$folder/$name.png"
+    [[ -f "$dest" && "$dest" -nt "$file" ]] && continue
+    tmp=$(mktemp -d)
+    qlmanage -t -s 800 -o "$tmp" "$file" >/dev/null 2>&1 || true
+    if [[ -f "$tmp/$(basename "$file").png" ]]; then
+      sips -Z 500 "$tmp/$(basename "$file").png" --out "$dest" >/dev/null
+    else
+      echo "skipped (no frame): $file"; rm -rf "$tmp"; continue
+    fi
+    rm -rf "$tmp"
+  elif [[ "$(echo "$folder" | tr 'A-Z' 'a-z')" =~ ^(logo_images|client_logos|partners_logos)$ ]]; then
     dest="$OUT/$folder/$name.png"
     [[ -f "$dest" && "$dest" -nt "$file" ]] && continue
     sips -s format png -Z 500 "$file" --out "$dest" >/dev/null 2>&1 || { echo "skipped (unreadable): $file"; continue; }

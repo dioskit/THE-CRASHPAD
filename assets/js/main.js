@@ -114,7 +114,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── LIGHTBOX ─────────────────────────────────────────────────────────────
   const lightbox = document.getElementById('lightbox-dialog');
   const lbImg = document.getElementById('lightbox-image');
-  const lbCaption = document.getElementById('lightbox-caption-text');
   let dragged = false;
 
   document.addEventListener('click', e => {
@@ -122,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!target || dragged || !lightbox?.showModal) return;
     lbImg.src = target.currentSrc || target.src;
     lbImg.alt = target.alt;
-    lbCaption.textContent = target.alt;
     lightbox.showModal();
   });
   document.getElementById('lightbox-close-btn')?.addEventListener('click', () => lightbox.close());
@@ -141,6 +139,81 @@ document.addEventListener('DOMContentLoaded', () => {
       strip.scrollLeft = startLeft - dx;
     });
   }
+
+  // ── TEAM: tap a photo for name + Instagram ─────────────────────────────────
+  // Version A flips the photo to show the details; version B opens a profile card.
+  const variant = key => document.body.dataset[key] || 'a';
+  const portraits = document.querySelectorAll('.portrait');
+  let memberCard;
+  const openMemberCard = p => {
+    if (!memberCard) {
+      memberCard = document.createElement('dialog');
+      memberCard.className = 'member-card';
+      memberCard.innerHTML = '<button type="button" class="member-card-close" aria-label="Close">&times;</button>'
+        + '<img alt=""><div class="member-card-body"><strong></strong><span class="member-card-ig"></span></div>';
+      document.body.appendChild(memberCard);
+      memberCard.querySelector('.member-card-close').addEventListener('click', () => memberCard.close());
+      memberCard.addEventListener('click', e => { if (e.target === memberCard) memberCard.close(); });
+    }
+    const { name, ig, photo } = p.dataset;
+    memberCard.querySelector('img').src = photo;
+    memberCard.querySelector('img').alt = name;
+    memberCard.querySelector('strong').textContent = name;
+    memberCard.querySelector('.member-card-ig').innerHTML = ig
+      ? `<a href="https://www.instagram.com/${encodeURIComponent(ig)}/" target="_blank" rel="noopener">@${ig.replace(/[<>&"]/g, '')} &#8599;</a>`
+      : '<span>Instagram coming soon</span>';
+    memberCard.showModal();
+  };
+  portraits.forEach(p => p.addEventListener('click', e => {
+    if (e.target.closest('a')) return;          // let Instagram links open
+    if (variant('vTeam') === 'b') { openMemberCard(p); return; }
+    const wasOpen = p.classList.contains('open');
+    portraits.forEach(o => o.classList.remove('open'));
+    p.classList.toggle('open', !wasOpen);
+  }));
+
+  // ── ACTIVITIES: tap a card for a short description ───────────────────────
+  // Version A flips the card; version B shows a notebook panel under the board.
+  const actGrid = document.querySelector('.activities-grid');
+  const notebook = document.querySelector('.act-notebook');
+  if (actGrid) {
+    const acts = JSON.parse(actGrid.dataset.acts || '[]');
+    const tiles = actGrid.querySelectorAll('.activity-tile');
+    const closeNotebook = () => { notebook.hidden = true; tiles.forEach(t => t.classList.remove('selected')); };
+    tiles.forEach(tile => tile.addEventListener('click', () => {
+      const a = acts[tile.dataset.act];
+      if (variant('vActs') === 'b') {
+        const same = tile.classList.contains('selected') && !notebook.hidden;
+        closeNotebook();
+        if (same) return;
+        tile.classList.add('selected');
+        notebook.querySelector('img').src = a.img;
+        notebook.querySelector('img').alt = a.label;
+        notebook.querySelector('.act-label').textContent = a.label;
+        notebook.querySelector('p').textContent = a.desc;
+        notebook.hidden = false;
+        notebook.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        return;
+      }
+      const flipped = tile.classList.toggle('flipped');
+      tile.setAttribute('aria-expanded', String(flipped));
+    }));
+    notebook?.querySelector('.act-notebook-close').addEventListener('click', closeNotebook);
+  }
+
+  // ── PARTNER / CLIENT LOGOS: phone sheet ──────────────────────────────────
+  document.querySelectorAll('.logos-open').forEach(btn => {
+    const sheet = document.getElementById(btn.dataset.open);
+    const close = () => { sheet.hidden = true; document.body.style.overflow = ''; btn.focus(); };
+    btn.addEventListener('click', () => {
+      sheet.hidden = false;
+      document.body.style.overflow = 'hidden';
+      sheet.querySelector('.logo-sheet-close').focus();
+    });
+    sheet.querySelector('.logo-sheet-close').addEventListener('click', close);
+    sheet.addEventListener('click', e => { if (e.target === sheet) close(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !sheet.hidden) close(); });
+  });
 
   // ── TOAST ────────────────────────────────────────────────────────────────
   const toast = document.getElementById('toast-notice');
