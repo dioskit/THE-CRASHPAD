@@ -15,3 +15,6 @@ public/
 # System / editor files
 .DS_Store
 .claude/
+
+# Temporary files from scripts/build-brochure.sh
+brochure/.print/

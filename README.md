@@ -27,6 +27,17 @@ Then open http://localhost:8000.
    Use `--clean` to rebuild everything.
 3. Reference the new file from `index.html`, then commit and push. Render redeploys automatically.
 
+## Learning brochure (PDF)
+
+The downloadable brochure is `assets/docs/crashpad-learning-brochure.pdf`. Its source is
+`brochure/learning-brochure.html` (open it in a browser to preview). After editing, re-export:
+
+```bash
+./scripts/build-brochure.sh
+```
+
+This needs Google Chrome installed; photos are downsized for the PDF automatically.
+
 ## Fonts
 
 Glacial Indifference is self-hosted in `assets/fonts/` (SIL Open Font License).

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Crashpad | Learning in the Mountains</title>
+<!--
+  Source for assets/docs/crashpad-learning-brochure.pdf
+  Re-export with:  ./scripts/build-brochure.sh
+-->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&display=swap');
+@font-face { font-family: 'Glacial Indifference'; font-weight: 400; src: url('../assets/fonts/glacial-indifference-400.woff2') format('woff2'); }
+@font-face { font-family: 'Glacial Indifference'; font-style: italic; font-weight: 400; src: url('../assets/fonts/glacial-indifference-400italic.woff2') format('woff2'); }
+@font-face { font-family: 'Glacial Indifference'; font-weight: 700; src: url('../assets/fonts/glacial-indifference-700.woff2') format('woff2'); }
+
+:root {
+  --white: #F8F8F8; --cream: #F8E8C8; --sand: #F8D8B8; --tan: #E8B878; --ink: #181808;
+  --accent: #8A5A1E; --muted: #554B3B; --subtle: #786C58; --paper: #FFFDF8;
+  --main: 'Glacial Indifference', 'Avenir Next', 'Century Gothic', sans-serif;
+  --hand: 'Caveat', 'Bradley Hand', cursive;
+}
+@page { size: A4; margin: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #ddd; }
+body { font-family: var(--main); color: var(--ink); font-size: 10.5pt; line-height: 1.55; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+img { display: block; max-width: 100%; }
+ul, ol { list-style: none; }
+
+.page {
+  width: 210mm; height: 297mm; overflow: hidden; position: relative;
+  padding: 18mm 18mm 16mm; background: var(--cream); page-break-after: always; break-after: page;
+  display: flex; flex-direction: column;
+}
+.page:last-child { page-break-after: auto; break-after: auto; }
+.page.white { background: var(--white); }
+.page.ink { background: var(--ink); color: var(--cream); }
+@media screen { .page { margin: 10mm auto; box-shadow: 0 4px 30px rgba(0,0,0,.2); } }
+
+.folio { position: absolute; bottom: 9mm; left: 18mm; right: 18mm; display: flex; justify-content: space-between;
+  font-size: 7.5pt; letter-spacing: .14em; text-transform: uppercase; color: var(--subtle); }
+.ink .folio { color: rgba(248,232,200,.55); }
+
+.eyebrow { font-size: 8pt; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin-bottom: 4mm; display: block; }
+.ink .eyebrow { color: var(--tan); }
+h1 { font-size: 40pt; line-height: 1.02; font-weight: 700; letter-spacing: -.01em; }
+h2 { font-size: 26pt; line-height: 1.1; font-weight: 700; margin-bottom: 5mm; }
+h2 em, h1 em { font-style: italic; font-weight: 400; color: var(--accent); }
+.ink h2 em, .ink h1 em { color: var(--tan); }
+h3 { font-size: 13pt; font-weight: 700; margin-bottom: 2mm; }
+p { margin-bottom: 3mm; color: var(--muted); }
+.ink p { color: rgba(248,232,200,.8); }
+.lead { font-size: 12.5pt; line-height: 1.5; color: var(--ink); }
+.hand { font-family: var(--hand); color: var(--accent); }
+
+/* polaroid prints with tape */
+.print { background: var(--paper); padding: 3mm 3mm 9mm; box-shadow: .8mm 1.2mm 0 rgba(24,24,8,.13); border: .25mm solid rgba(24,24,8,.08); position: relative; }
+.print::before { content: ''; position: absolute; top: -3mm; left: 50%; width: 22mm; height: 6mm; transform: translateX(-50%) rotate(-3deg); background: rgba(232,184,120,.6); }
+.print img { width: 100%; height: 100%; object-fit: cover; }
+.print .cap { position: absolute; left: 0; right: 0; bottom: 1.5mm; text-align: center; font-family: var(--hand); font-size: 13pt; color: var(--accent); }
+
+.pill { display: inline-block; padding: 1mm 3.5mm; border-radius: 99px; background: var(--sand); font-size: 8.5pt; margin: 0 1.5mm 1.5mm 0; color: var(--ink); }
+.rule { height: 1px; background: rgba(24,24,8,.15); margin: 5mm 0; }
+
+/* ---------- cover */
+.cover { padding: 0; background: var(--ink); color: var(--cream); }
+.cover-photo { position: absolute; inset: 0; }
+.cover-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 40% 50%; }
+.cover-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8,8,8,.15) 0%, rgba(8,8,8,.1) 45%, rgba(8,8,8,.85) 100%); }
+.cover-top { position: relative; z-index: 1; padding: 16mm 18mm 0; display: flex; justify-content: space-between; align-items: flex-start; }
+.cover-top .logo { background: var(--white); padding: 3mm 4mm; border-radius: 2mm; height: 22mm; width: auto; }
+.cover-top .tag { font-size: 8pt; letter-spacing: .16em; text-transform: uppercase; color: var(--cream); text-align: right; }
+.cover-body { position: relative; z-index: 1; margin-top: auto; padding: 0 18mm 22mm; }
+.cover-body h1 { color: var(--white); font-size: 46pt; }
+.cover-body h1 em { color: var(--sand); display: block; }
+.cover-body .sub { margin-top: 6mm; font-size: 12pt; color: rgba(248,248,248,.88); max-width: 140mm; }
+.cover-body .hand { color: var(--tan); font-size: 20pt; display: block; margin-top: 6mm; transform: rotate(-2deg); transform-origin: left; }
+
+/* ---------- two column layouts */
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10mm; }
+.cols-60 { display: grid; grid-template-columns: 1.25fr 1fr; gap: 10mm; }
+
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; margin: 6mm 0; }
+.stats div { background: var(--white); border-radius: 2mm; padding: 4mm; }
+.stats strong { display: block; font-size: 22pt; color: var(--accent); line-height: 1; }
+.stats span { font-size: 7.5pt; letter-spacing: .1em; text-transform: uppercase; color: var(--subtle); }
+
+.base { background: var(--white); border-radius: 2mm; overflow: hidden; }
+.base img { height: 38mm; width: 100%; object-fit: cover; }
+.base div { padding: 4mm; }
+.base small { font-size: 7.5pt; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+
+/* ---------- beliefs */
+.quote { font-size: 20pt; line-height: 1.3; font-style: italic; border-left: 1.2mm solid var(--tan); padding-left: 6mm; margin: 2mm 0 8mm; color: var(--ink); }
+.beliefs { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm 8mm; }
+.beliefs li { padding-top: 3mm; border-top: .6mm solid var(--tan); }
+.beliefs li strong { display: block; font-size: 12pt; margin-bottom: 1mm; }
+.beliefs li p { font-size: 9.5pt; margin: 0; }
+
+/* ---------- method cycle */
+.cycle { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin: 4mm 0 8mm; border-top: .3mm solid rgba(248,232,200,.35); }
+.cycle li { padding: 5mm 5mm 0 0; position: relative; }
+.cycle li:not(:last-child)::after { content: '\2192'; position: absolute; right: 2mm; top: 4mm; color: var(--tan); font-size: 14pt; }
+.cycle .n { font-size: 8pt; letter-spacing: .14em; color: var(--tan); }
+.cycle strong { display: block; font-size: 17pt; margin: 1mm 0 2mm; color: var(--white); }
+.cycle p { font-size: 9pt; }
+.example { background: rgba(248,232,200,.08); border: .3mm dashed rgba(232,184,120,.6); border-radius: 2mm; padding: 6mm; }
+.example .hand { color: var(--tan); font-size: 17pt; display: block; margin-bottom: 2mm; }
+.example ol { counter-reset: ex; display: grid; gap: 3mm; }
+.example li { counter-increment: ex; display: grid; grid-template-columns: 22mm 1fr; gap: 3mm; font-size: 9.5pt; color: rgba(248,232,200,.85); }
+.example li strong { color: var(--tan); }
+
+/* ---------- activity board */
+.board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7mm 5mm; margin-top: 4mm; }
+.act { background: var(--paper); padding: 2.5mm 2.5mm 3mm; box-shadow: .7mm 1mm 0 rgba(24,24,8,.12); border: .25mm solid rgba(24,24,8,.08); position: relative; transform: rotate(var(--t, -1.2deg)); }
+.act:nth-child(2n) { --t: 1.4deg; } .act:nth-child(3n) { --t: -.5deg; } .act:nth-child(5n+1) { --t: 1.9deg; }
+.act::before { content: ''; position: absolute; top: -2.5mm; left: 50%; width: 14mm; height: 4.5mm; transform: translateX(-50%) rotate(-3deg); background: rgba(232,184,120,.6); }
+.act img { width: 100%; aspect-ratio: 1; object-fit: contain; background: #fff; }
+.act b { display: block; font-family: var(--hand); font-size: 13pt; text-align: center; line-height: 1.05; margin: 1.5mm 0 1mm; color: var(--ink); }
+.act span { display: block; font-size: 7.4pt; line-height: 1.35; color: var(--muted); text-align: center; }
+
+/* ---------- grades */
+.grade { display: grid; grid-template-columns: 58mm 1fr; gap: 7mm; padding: 5mm 0; border-top: .3mm solid rgba(24,24,8,.15); }
+.grade:first-of-type { border-top: 0; }
+.grade .print { height: 50mm; transform: rotate(-1.5deg); }
+.grade:nth-of-type(2) .print { transform: rotate(1.5deg); }
+.grade .badge { display: inline-block; font-size: 7.5pt; letter-spacing: .12em; text-transform: uppercase; background: var(--sand); padding: .8mm 3mm; border-radius: 99px; margin-bottom: 2mm; }
+.grade h3 { font-size: 15pt; }
+.grade .focus { font-size: 9.5pt; margin-bottom: 2mm; }
+.grade ul { columns: 2; column-gap: 6mm; font-size: 9pt; margin-bottom: 2mm; }
+.grade ul li { padding-left: 4mm; position: relative; color: var(--ink); break-inside: avoid; }
+.grade ul li::before { content: '\2192'; position: absolute; left: 0; color: var(--accent); }
+
+/* ---------- day + safety */
+.sched li { display: grid; grid-template-columns: 30mm 1fr; gap: 4mm; padding: 2.4mm 0; border-bottom: .3mm solid rgba(24,24,8,.1); font-size: 9.5pt; }
+.sched li:last-child { border-bottom: 0; }
+.sched .t { color: var(--accent); }
+.sched strong { display: block; }
+.sched span { color: var(--muted); font-size: 8.8pt; }
+.safety { background: var(--sand); border-left: 1.2mm solid var(--accent); padding: 5mm 6mm; border-radius: 0 2mm 2mm 0; }
+.safety li { padding-left: 5mm; position: relative; font-size: 9.5pt; margin-bottom: 1.5mm; }
+.safety li::before { content: '\2713'; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+
+/* ---------- back page */
+.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5mm; margin: 6mm 0 8mm; }
+.steps li { background: rgba(248,232,200,.08); border-radius: 2mm; padding: 5mm; }
+.steps .n { font-size: 20pt; color: var(--tan); font-weight: 700; line-height: 1; }
+.steps strong { display: block; color: var(--white); margin: 2mm 0 1mm; }
+.steps p { font-size: 8.8pt; margin: 0; }
+.contact { display: grid; grid-template-columns: 1fr 1fr; gap: 8mm; margin-top: auto; padding-top: 8mm; border-top: .3mm solid rgba(248,232,200,.25); }
+.contact small { font-size: 7.5pt; letter-spacing: .14em; text-transform: uppercase; color: var(--tan); display: block; }
+.contact strong { font-size: 13pt; color: var(--white); }
+.method-photos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7mm; margin-top: auto; margin-bottom: 8mm; }
+.method-photos .print { height: 52mm; }
+.back-logo { height: 24mm; width: auto; background: var(--white); padding: 3mm 4mm; border-radius: 2mm; }
+</style>
+</head>
+<body>
+
+<!-- 1 · COVER -->
+<section class="page cover">
+  <div class="cover-photo"><img src="../assets/img/Suru_images/img-10-image-crop-0ef8b.jpg" alt=""></div>
+  <div class="cover-top">
+    <img class="logo" src="../assets/img/Logo_images/crashpadlogo.png" alt="The Crashpad">
+    <div class="tag">School programmes<br>&amp; experiential learning</div>
+  </div>
+  <div class="cover-body">
+    <h1>Learning<em>in the mountains.</em></h1>
+    <p class="sub">Adventure, nature, hands on skills and teamwork for schools, at Zoom Rock Garden in Sikkim and Suru Valley in Ladakh.</p>
+    <span class="hand">come explore, experiment, collaborate!</span>
+  </div>
+</section>
+
+<!-- 2 · WHO WE ARE -->
+<section class="page">
+  <span class="eyebrow">Who we are</span>
+  <h2>An outdoor collective rooted in the <em>Indian Himalayas</em></h2>
+  <div class="cols-60">
+    <div>
+      <p class="lead">Crashpad brings together adventure sports, experiential learning, movement practices, festivals and community led initiatives.</p>
+      <p>Working across Suru Valley in Ladakh and Zoom Rock Garden in Sikkim, we create opportunities for people to learn new skills, take part in outdoor activities, experience different movement practices and connect through shared experiences.</p>
+      <p>We are a core team supported by volunteers, instructors, collaborators and local communities. Our team includes certified outdoor guides, climbers, movement practitioners, natural builders, musicians and event organisers, and every school programme is run by the same people who build and run our festivals.</p>
+      <p>We value shared learning and practical involvement. For schools, that means students don't just watch: they climb, build, navigate, cook and solve problems with their own hands.</p>
+    </div>
+    <div class="print" style="height: 78mm; transform: rotate(2deg); margin-top: 4mm;">
+      <img src="../assets/img/community/s-fst-s-ch.jpg" alt="">
+      <span class="cap">our crew in the mountains</span>
+    </div>
+  </div>
+  <div class="stats">
+    <div><strong>10+</strong><span>Years in the outdoors</span></div>
+    <div><strong>10,000+</strong><span>People have joined us</span></div>
+    <div><strong>2</strong><span>Himalayan bases</span></div>
+  </div>
+  <div class="cols">
+    <div class="base">
+      <img src="../assets/img/ZLS/whatsapp-image-2026-10-11-at-18-20-20.jpg" alt="">
+      <div><small>November to April</small><h3>Zoom Rock Garden, Sikkim</h3><p style="margin:0; font-size:9pt;">Thirty acres of forest, boulders and open land with bouldering circuits, rope courses, farming and natural building. Our winter base for school programmes.</p></div>
+    </div>
+    <div class="base">
+      <img src="../assets/img/suru_collage/dsc08720.jpg" alt="">
+      <div><small>May to October</small><h3>Suru Valley, Ladakh</h3><p style="margin:0; font-size:9pt;">A wild high landscape of towering rock, glacial rivers and open valleys. Home of Suru Outdoor Fest and our summer programmes.</p></div>
+    </div>
+  </div>
+  <div class="folio"><span>The Crashpad</span><span>02</span></div>
+</section>
+
+<!-- 3 · WHAT WE BELIEVE -->
+<section class="page white">
+  <span class="eyebrow">What we believe</span>
+  <h2 style="max-width: 120mm;">Learning happens <em>beyond the classroom</em></h2>
+  <p class="quote" style="max-width: 120mm;">“Some of the most meaningful learning happens beyond the classroom.”</p>
+  <p class="lead">Experiential learning is learning by doing, exploring and reflecting on real world experiences.</p>
+  <p>Whether it's climbing a rock face, building with natural materials, navigating a trail or working together to solve a challenge, every experience is a chance to develop new skills, build confidence, strengthen relationships and discover new perspectives. At Crashpad, learning isn't just about acquiring knowledge. It's about putting it into practice, learning from the experience, and carrying those lessons into everyday life.</p>
+  <div class="rule"></div>
+  <ul class="beliefs">
+    <li><strong>Experience comes first</strong><p>Students understand balance on a slackline and teamwork on a rope before we put words to them. The doing makes the lesson stick.</p></li>
+    <li><strong>Reflection turns doing into learning</strong><p>Every activity ends in a circle. What happened, what felt hard, what would you try differently? This is where growth happens.</p></li>
+    <li><strong>Nature is a teacher</strong><p>Forests, rock and soil teach patience, observation and respect. We help students notice the living world around them.</p></li>
+    <li><strong>Challenge, with care</strong><p>We set challenges just beyond comfort and support every student through them, with trained instructors and the right equipment.</p></li>
+    <li><strong>Together, not alone</strong><p>Most of our activities only work as a team. Students learn to communicate, trust and lean on each other.</p></li>
+    <li><strong>Hands, not just heads</strong><p>Building walls, growing food and lighting a safe fire build practical confidence that lasts long after the visit.</p></li>
+  </ul>
+  <div class="print" style="position:absolute; right: 18mm; top: 18mm; width: 44mm; height: 44mm; transform: rotate(4deg);">
+    <img src="../assets/img/NaturalBuilding_images/0y9a2156.jpg" alt="">
+    <span class="cap">learning by doing!</span>
+  </div>
+  <div class="folio"><span>What we believe</span><span>03</span></div>
+</section>
+
+<!-- 4 · OUR METHOD -->
+<section class="page ink">
+  <span class="eyebrow">Our method</span>
+  <h2>How we <em>teach</em></h2>
+  <p class="lead" style="color: var(--cream);">Every activity, from a first boulder to building an earthen wall, follows the same simple cycle.</p>
+  <ol class="cycle">
+    <li><span class="n">01</span><strong>Do</strong><p>Start with a real experience: a climb, a build, a trail, a team challenge. Instructors demonstrate, then step back and let students try.</p></li>
+    <li><span class="n">02</span><strong>Reflect</strong><p>Pause together. What happened? What felt hard? What worked? Short group circles give every voice space.</p></li>
+    <li><span class="n">03</span><strong>Make sense</strong><p>Connect the experience to skills and ideas: problem solving, collaboration, physics, ecology and the natural world.</p></li>
+    <li><span class="n">04</span><strong>Apply</strong><p>Try again, take on more, and carry the lesson home, into the classroom and into everyday life.</p></li>
+  </ol>
+  <div class="example">
+    <span class="hand">what it looks like on the rock</span>
+    <ol>
+      <li><strong>Do</strong><span>A group of Grade 6 students tries a climbing route in pairs, one climbing, one belaying with an instructor.</span></li>
+      <li><strong>Reflect</strong><span>At the bottom, each pair shares where they got stuck and how their partner helped.</span></li>
+      <li><strong>Make sense</strong><span>We talk about body position, friction and trust, and why clear calls between partners keep everyone safe.</span></li>
+      <li><strong>Apply</strong><span>They swap roles and climb again, using one new idea. Most get higher the second time.</span></li>
+    </ol>
+  </div>
+  <div style="margin-top: 8mm;">
+    <span class="hand" style="font-size: 16pt; color: var(--tan);">what we nurture</span><br>
+    <span class="pill">Curiosity</span><span class="pill">Collaboration</span><span class="pill">Problem solving</span><span class="pill">Confidence</span><span class="pill">Resilience</span><span class="pill">Connection with nature</span>
+  </div>
+  <div class="method-photos">
+    <div class="print" style="transform: rotate(-2deg);"><img src="../assets/img/Students_images/img-1095.jpg" alt=""><span class="cap">do</span></div>
+    <div class="print" style="transform: rotate(1.5deg);"><img src="../assets/img/Learning_images/grade6-8.jpg" alt=""><span class="cap">reflect</span></div>
+    <div class="print" style="transform: rotate(-1deg);"><img src="../assets/img/Students_images/img-1099.jpg" alt=""><span class="cap">apply</span></div>
+  </div>
+  <div class="folio"><span>Our method</span><span>04</span></div>
+</section>
+
+<!-- 5 · ACTIVITIES -->
+<section class="page">
+  <span class="eyebrow">School programmes · Zoom Rock Garden</span>
+  <h2>Pick a few, <em>or try them all</em></h2>
+  <p>Programmes are full day visits. We choose activities according to the students' ages, group size and learning objectives, and every one is led by trained instructors with proper safety equipment.</p>
+  <div class="board">
+    <div class="act"><img src="../assets/img/Learning_images/top-rope-climbing.jpg" alt=""><b>Top Rope Climbing</b><span>Climbing a real rock face on a rope held safely from above. Knots, belaying and trusting a partner.</span></div>
+    <div class="act"><img src="../assets/img/Learning_images/bouldering.jpg" alt=""><b>Bouldering</b><span>Short climbs on low boulders over thick crash pads. Puzzling, falling, laughing, trying again.</span></div>
+    <div class="act"><img src="../assets/img/Learning_images/rappelling.jpg" alt=""><b>Rappelling</b><span>Walking backwards down a cliff on a rope, with an instructor beside every student.</span></div>
+    <div class="act"><img src="../assets/img/Learning_images/high-ropes.jpg" alt=""><b>High Ropes</b><span>Balance beams, swinging logs and wobbly bridges in the trees, clipped in the whole way.</span></div>
+    <div class="act"><img src="../assets/img/Learning_images/camping.jpg" alt=""><b>Camping</b><span>Pitching tents, cooking together and a night under the stars. Teamwork starts with the tent.</span></div>
+    <div class="act"><img src="../assets/img/Learning_images/slackline.jpg" alt=""><b>Slackline</b><span>Walking a flat, bouncy line between two trees. Focus, balance and cheering each other on.</span></div>
+    <div class="act"><img src="../assets/img/Learning_images/orienteering.jpg" alt=""><b>Orienteering</b><span>Finding hidden checkpoints with map and compass. Planning routes and reading the land.</span></div>
+    <div class="act"><img src="../assets/img/Learning_images/bushcraft.jpg" alt=""><b>Bush Craft</b><span>Building shelters, lighting a safe fire and using what the forest offers.</span></div>
+    <div class="act"><img src="../assets/img/Learning_images/naturalbuilding.jpg" alt=""><b>Natural Building</b><span>Mixing mud, packing earth and shaping real walls with our own hands.</span></div>
+    <div class="act"><img src="../assets/img/Learning_images/farming.jpg" alt=""><b>Farming</b><span>Sowing seeds, making compost and learning where food comes from.</span></div>
+  </div>
+  <div class="folio"><span>Activities</span><span>05</span></div>
+</section>
+
+<!-- 6 · BY GRADE -->
+<section class="page white">
+  <span class="eyebrow">Programme by grade</span>
+  <h2>Growing with <em>every age</em></h2>
+  <div class="grade">
+    <div class="print"><img src="../assets/img/Learning_images/grade4-5.jpg" alt=""><span class="cap">grades 4 to 5</span></div>
+    <div>
+      <span class="badge">Ages 9 to 11</span>
+      <h3>Discover, Play &amp; Explore</h3>
+      <p class="focus">Focus: curiosity, confidence, movement and learning through play.</p>
+      <ul><li>Introductory rock climbing</li><li>Nature walks and discovery games</li><li>Orienteering with simple maps and clues</li><li>Team building games</li><li>Farming and soil exploration</li><li>Basic bushcraft</li></ul>
+      <span class="pill">Confidence</span><span class="pill">Observation</span><span class="pill">Teamwork</span><span class="pill">Environmental awareness</span>
+    </div>
+  </div>
+  <div class="grade">
+    <div class="print"><img src="../assets/img/Learning_images/grade6-8.jpg" alt=""><span class="cap">grades 6 to 8</span></div>
+    <div>
+      <span class="badge">Ages 12 to 14</span>
+      <h3>Explore, Create &amp; Collaborate</h3>
+      <p class="focus">Focus: practical skills, teamwork, problem solving and environmental awareness.</p>
+      <ul><li>Rock climbing on natural crags</li><li>Map and compass navigation</li><li>Nature education and biodiversity</li><li>Natural building and construction</li><li>Farming and composting</li><li>Bushcraft and team challenges</li></ul>
+      <span class="pill">Resilience</span><span class="pill">Collaboration</span><span class="pill">Creativity</span><span class="pill">Practical skills</span>
+    </div>
+  </div>
+  <div class="grade">
+    <div class="print"><img src="../assets/img/Learning_images/grade9-12.jpg" alt=""><span class="cap">grades 9 to 12</span></div>
+    <div>
+      <span class="badge">Ages 15 to 18</span>
+      <h3>Challenge, Lead &amp; Apply</h3>
+      <p class="focus">Focus: leadership, critical thinking, responsibility and applied learning.</p>
+      <ul><li>Technical climbing and rappelling</li><li>Orienteering and route planning</li><li>Ecology and landscape studies</li><li>Sustainable natural building</li><li>Farming and resource management</li><li>Leadership and outdoor planning</li></ul>
+      <span class="pill">Leadership</span><span class="pill">Accountability</span><span class="pill">Risk awareness</span><span class="pill">Critical thinking</span>
+    </div>
+  </div>
+  <div class="folio"><span>Programme by grade</span><span>06</span></div>
+</section>
+
+<!-- 7 · A DAY + SAFETY -->
+<section class="page">
+  <span class="eyebrow">A sample day</span>
+  <h2>9 AM to 4 PM, <em>outdoors</em></h2>
+  <p>A typical structure, adapted to group size, grade, weather and learning objectives.</p>
+  <div class="cols-60" style="margin-top: 3mm;">
+    <ul class="sched">
+      <li><span class="t">9:00 to 9:30</span><div><strong>Welcome &amp; orientation</strong><span>Introductions, icebreakers and safety briefing</span></div></li>
+      <li><span class="t">9:30 to 10:30</span><div><strong>Nature exploration</strong><span>Orienteering, nature walks and discovery games</span></div></li>
+      <li><span class="t">10:30 to 10:45</span><div><strong>Snack &amp; water break</strong></div></li>
+      <li><span class="t">10:45 to 12:15</span><div><strong>Adventure activity</strong><span>Rock climbing, high ropes or rappelling, by grade</span></div></li>
+      <li><span class="t">12:15 to 1:00</span><div><strong>Nature education</strong><span>Biodiversity, ecology or a related learning activity</span></div></li>
+      <li><span class="t">1:00 to 2:00</span><div><strong>Lunch &amp; rest</strong></div></li>
+      <li><span class="t">2:00 to 3:00</span><div><strong>Practical workshop</strong><span>Natural building, farming or bushcraft</span></div></li>
+      <li><span class="t">3:00 to 3:45</span><div><strong>Team challenge</strong><span>Collaborative problem solving</span></div></li>
+      <li><span class="t">3:45 to 4:00</span><div><strong>Reflection &amp; departure</strong><span>Group circle and shared reflections</span></div></li>
+    </ul>
+    <div>
+      <div class="print" style="height: 62mm; transform: rotate(-2deg); margin: 4mm 0 10mm;">
+        <img src="../assets/img/Students_images/img-1094.jpg" alt="">
+        <span class="cap">high ropes, all clipped in</span>
+      </div>
+      <div class="safety">
+        <h3>Safety &amp; care</h3>
+        <ul>
+          <li>Certified outdoor guides and a Wilderness First Aid certified team</li>
+          <li>Risk assessment before every activity</li>
+          <li>Age appropriate activities and trained supervision</li>
+          <li>Proper safety equipment and briefings</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="folio"><span>A sample day</span><span>07</span></div>
+</section>
+
+<!-- 8 · BRING YOUR SCHOOL -->
+<section class="page ink">
+  <span class="eyebrow">Bring your school</span>
+  <h2>Let's plan a day <em>together</em></h2>
+  <p class="lead" style="color: var(--cream);">Every programme is planned with the school, around your students and what you want them to learn.</p>
+  <ol class="steps">
+    <li><span class="n">1</span><strong>Get in touch</strong><p>Write to us with your school's name and contact details.</p></li>
+    <li><span class="n">2</span><strong>Tell us about your group</strong><p>Grade, group size, preferred dates and location.</p></li>
+    <li><span class="n">3</span><strong>Share your objectives</strong><p>What should students take away? We shape the day around it.</p></li>
+    <li><span class="n">4</span><strong>We plan it together</strong><p>Activities, timings, safety and logistics, confirmed with you.</p></li>
+  </ol>
+  <div class="cols" style="align-items: center;">
+    <div class="print" style="height: 70mm; transform: rotate(-2deg);">
+      <img src="../assets/img/Students_images/img-1099.jpg" alt="">
+      <span class="cap">see you outdoors!</span>
+    </div>
+    <div>
+      <p>Programmes run at Zoom Rock Garden, Sikkim from November to April, and in Suru Valley, Ladakh from May to October. We also design custom programmes and extended camps for schools and groups.</p>
+      <p class="hand" style="font-size: 18pt; color: var(--tan);">come explore, experiment, collaborate and discover what you are capable of.</p>
+    </div>
+  </div>
+  <div class="contact">
+    <div><small>Email</small><strong>contact@thecrashpad.in</strong></div>
+    <div style="display:flex; justify-content:flex-end;"><img class="back-logo" src="../assets/img/Logo_images/crashpadlogo.png" alt="The Crashpad"></div>
+  </div>
+  <div class="folio"><span>The Crashpad · Play · Explore · Learn</span><span>08</span></div>
+</section>
+
+</body>
+</html>
