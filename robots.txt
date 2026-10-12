@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /brochure/
+Disallow: /scripts/
+
+Sitemap: https://thecrashpad.in/sitemap.xml
