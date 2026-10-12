@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
         '',
         val('contact-message')
       ].join('\n');
-      window.location.href = `mailto:contact@thecrashpad.in?subject=${encodeURIComponent(`${interest} — ${name}`)}&body=${encodeURIComponent(body)}`;
+      window.location.href = `mailto:crashpadmangar@gmail.com?subject=${encodeURIComponent(`${interest} — ${name}`)}&body=${encodeURIComponent(body)}`;
       showToast(`Thanks, ${name}. Your email app should open with the message ready to send.`);
     };
 
@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         form.reset();
       } catch (err) {
         console.error(err);
-        showToast('Sorry, the message could not be sent. Please email us at contact@thecrashpad.in.');
+        showToast('Sorry, the message could not be sent. Please email us at crashpadmangar@gmail.com.');
       } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = label;
